@@ -110,7 +110,7 @@ def loginPage():
 
 def skipHelpSection():
     try:
-        iDontNeedHelpButton = driver.find_element(By.CSS_SELECTOR, "button[aria-label='I don\'t want help setting up']")
+        iDontNeedHelpButton = driver.find_element(By.CSS_SELECTOR, "button[aria-label='I don\\'t want help setting up']")
         wrapClickButton(iDontNeedHelpButton)
     except Exception as e:
         print(f"Failed to click on the 'I don't want help setting up' button: {e}")
