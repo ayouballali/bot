@@ -1,15 +1,16 @@
 import random
 from telnetlib import EC
+import subprocess
 from urllib.parse import urlparse, parse_qs
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
-# Wait for the page to load (you can adjust the sleep time as needed)
 import time
-
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 # Set up the webdriver (Make sure the path to your webdriver is correct)
 driver = webdriver.Chrome()
@@ -42,24 +43,18 @@ def startFreeTrial():
 
 def SkipBusinessLocation():
     try:
-        # Wait for the "Next" button to be clickable
-        child_element = driver.find_element(By.XPATH, "//span[text()='Next']")
-
-        # Get the parent element using XPath
-        parent_element = child_element.find_element(By.XPATH, "..")
-        wrapClickButton(parent_element)
-
-        print("Clicked on the 'Next' button.")
-
-    except Exception as e:
-        try:
-            parent_element2 = parent_element.find_element(By.XPATH, "..")
-            wrapClickButton(parent_element2)
-            print(f"Failed to click on the 'Next' button: {e}")
-        except Exception as e:
-            print("Failed to click on the 'Next' button.")
-            main()
-            raise e
+        # Check if the "Next" button exists
+        next_button = WebDriverWait(driver, 5).until(
+            EC.presence_of_element_located((By.XPATH, "//span[text()='Next']/.."))
+        )
+        wrapClickButton(next_button)
+        print("'Next' button found. Restarting the script...")
+        driver.quit()
+        main()
+    except (TimeoutException, NoSuchElementException):
+        print("'Next' button not found. Continuing with the script...")
+        # Continue with the rest of the script
+        pass
 
 
 #Step3
@@ -123,14 +118,10 @@ def clickOrdersButton():
     oredersButton = driver.find_element(By.XPATH, "//span[text()='Orders']")
     wrapClickButton(oredersButton)
 
+def run_secondary_script():
+    # Replace 'path/to/your/secondary_script.py' with the actual path to your secondary script
+    subprocess.run(['python', '/Users/simo/Desktop/bot/src/test.py'])
 
-def testRidExisted():
-    currentUrl = driver.current_url
-    parsedUrl = urlparse(currentUrl)
-    query_params = parse_qs(parsedUrl.query)
-    if 'rid' in query_params.keys():
-        return True
-    return False
 
 
 def main():
@@ -141,7 +132,6 @@ def main():
     #Step 1
     startFreeTrial()
     # // check if there is the rid 
-    print(testRidExisted())
     #Step2
     SkipBusinessLocation()
 
@@ -161,10 +151,29 @@ def main():
     #click on orders
     random_sleep(15, 20)
     clickOrdersButton()
-    while True:
-        time.sleep(5)
 
-main()
+def main_loop():
+    global driver
+    while True:
+        try:
+            main()
+            print("Main script completed. Starting secondary script loop.")
+            driver.quit()
+
+            # After main() completes, run the secondary script every 5 seconds
+            while True:
+                run_secondary_script()
+                time.sleep(5)
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            print("Restarting the main script...")
+            driver.quit()
+            driver = webdriver.Chrome()
+
+
+if __name__ == "__main__":
+    main_loop()
 
 
 
