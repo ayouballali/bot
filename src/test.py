@@ -42,7 +42,6 @@ def startFreeTrial():
 
 
 def SkipBusinessLocation():
-    try:
         # Check if the "Next" button exists
         next_button = WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.XPATH, "//span[text()='Next']/.."))
@@ -51,31 +50,20 @@ def SkipBusinessLocation():
         print("'Next' button found. Restarting the script...")
         driver.quit()
         main()
-    except (TimeoutException, NoSuchElementException):
-        print("'Next' button not found. Continuing with the script...")
-        # Continue with the rest of the script
-        pass
 
 
 #Step3
 def clickOnSignUpWithEmail():
     # driver.quit()
     # raise Exception("Email not found")
-    try:
         next_button = driver.find_element(By.CSS_SELECTOR, ".signup a.ui-button.ui-button--full-width")
         wrapClickButton(next_button)
-    except Exception as e:
-        print(f"Failed to click on the 'Next' button: {e}")
 
 
 def fillAccountCredentials():
-    try:
         fillSignUpWithEmail()
         fillSignUpWithPassword()
         submitCredentials()
-    except Exception as e:
-        print(f"Failed to click on the 'Next' button: {e}")
-
 
 #Step4
 def fillSignUpWithEmail():
@@ -101,14 +89,9 @@ def loginPage():
 
 
 def skipHelpSection():
-    try:
         iDontNeedHelpButton = driver.find_element(By.CSS_SELECTOR,
                                                   "button[aria-label='I don\\'t want help setting up']")
         wrapClickButton(iDontNeedHelpButton)
-    except Exception as e:
-        print(f"Failed to click on the 'I don't want help setting up' button: {e}")
-
-
 def random_sleep(min_time=2, max_time=5):
     """Pause for a random amount of time between actions."""
     time.sleep(random.uniform(min_time, max_time))
@@ -154,22 +137,18 @@ def main():
 
 def main_loop():
     global driver
-    while True:
-        try:
-            main()
-            print("Main script completed. Starting secondary script loop.")
-            driver.quit()
+    try:
+        main()
+        print("Main script completed. Starting secondary script loop.")
+        driver.quit()
 
-            # After main() completes, run the secondary script every 5 seconds
-            while True:
-                run_secondary_script()
-                time.sleep(5)
 
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            print("Restarting the main script...")
-            driver.quit()
-            driver = webdriver.Chrome()
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        print("Restarting the main script...")
+        driver.quit()
+        driver = webdriver.Chrome()
+        main()
 
 
 if __name__ == "__main__":
