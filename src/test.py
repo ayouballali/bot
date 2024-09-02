@@ -1,4 +1,5 @@
 import random
+import traceback
 from telnetlib import EC
 import subprocess
 from urllib.parse import urlparse, parse_qs
@@ -43,19 +44,19 @@ def startFreeTrial():
 
 def SkipBusinessLocation():
     try:
+        global driver
         # Check if the "Next" button exists
         next_button = WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.XPATH, "//span[text()='Next']/.."))
         )
         wrapClickButton(next_button)
         print("'Next' button found. Restarting the script...")
-        driver.quit()
-        main()
-    except (TimeoutException, NoSuchElementException):
+    except (TimeoutException, NoSuchElementException) as e:
         print("'Next' button not found. Continuing with the script...")
         # Continue with the rest of the script
-        pass
-
+        driver.quit()
+        driver = webdriver.Chrome()
+        main()
 
 #Step3
 def clickOnSignUpWithEmail():
@@ -118,11 +119,6 @@ def clickOrdersButton():
     oredersButton = driver.find_element(By.XPATH, "//span[text()='Orders']")
     wrapClickButton(oredersButton)
 
-def run_secondary_script():
-    # Replace 'path/to/your/secondary_script.py' with the actual path to your secondary script
-    subprocess.run(['python', '/Users/simo/Desktop/bot/src/test.py'])
-
-
 
 def main():
     # Open the webpage
@@ -154,22 +150,14 @@ def main():
 
 def main_loop():
     global driver
-    while True:
-        try:
-            main()
-            print("Main script completed. Starting secondary script loop.")
-            driver.quit()
-
-            # After main() completes, run the secondary script every 5 seconds
-            while True:
-                run_secondary_script()
-                time.sleep(5)
-
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            print("Restarting the main script...")
-            driver.quit()
-            driver = webdriver.Chrome()
+    try:
+        main()
+        print("Main script completed. Starting secondary script loop.")
+        driver.quit()
+    except Exception as e:
+        print(f"An error occurred: {traceback.format_exc()}")
+        print("Restarting the main script...")
+        driver.quit()
 
 
 if __name__ == "__main__":
