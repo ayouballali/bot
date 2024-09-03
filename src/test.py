@@ -19,6 +19,14 @@ EMAIL = "jkh_jlop69@hotmail.com"
 PASSWORD = "pptproject12345"
 
 
+class NotClickable(Exception):
+    def __init__(self, message):
+        super().__init__(message)  # Initialize the base Exception with the message
+
+    def __str__(self):
+        return f"{self.args[0]} "
+
+
 def checkIfThereIsAnySkippedStep():
     isThereAnySkipElement = True
     while isThereAnySkipElement:
@@ -31,10 +39,13 @@ def checkIfThereIsAnySkippedStep():
 
 
 def wrapClickButton(element):
-    random_sleep()
-    element.click()
-    random_sleep(6, 10)
-    checkIfThereIsAnySkippedStep()
+    try:
+        random_sleep()
+        element.click()
+        random_sleep(6, 10)
+        checkIfThereIsAnySkippedStep()
+    except Exception as e:
+        raise NotClickable("the element is not clickable" + str(e))
 
 
 def startFreeTrial():
@@ -52,11 +63,14 @@ def SkipBusinessLocation():
         wrapClickButton(next_button)
         print("'Next' button found. Restarting the script...")
     except (TimeoutException, NoSuchElementException) as e:
-        print("'Next' button not found. Continuing with the script...")
-        # Continue with the rest of the script
-        driver.quit()
-        driver = webdriver.Chrome()
-        main()
+        if isinstance(e, NotClickable):
+            driver.quit()
+            driver = webdriver.Chrome()
+            main()
+        else:
+            print(str(traceback.print_exc()))
+            pass
+
 
 #Step3
 def clickOnSignUpWithEmail():
@@ -148,6 +162,7 @@ def main():
     random_sleep(15, 20)
     clickOrdersButton()
 
+
 def main_loop():
     global driver
     try:
@@ -163,9 +178,22 @@ def main_loop():
 if __name__ == "__main__":
     main_loop()
 
-
-
 # there is two option to solve the next button in location check :
-    #1st option: get the rid from url and use it to skip the location step
-        # https://accounts.shopify.com/signup?rid=6fc79cdc-e465-45a7-9437-883f289c76c8
-    #2nd option : so if the next button not clickable just restart the whole script over till it doesn't appear .
+#1st option: get the rid from url and use it to skip the location step
+# https://accounts.shopify.com/signup?rid=6fc79cdc-e465-45a7-9437-883f289c76c8
+#2nd option : so if the next button not clickable just restart the whole script over till it doesn't appear .
+
+
+"""
+    class for driver : initialize drive , handle connection proxies 
+    class initialize environment: json file .... 
+    class for Manager : that manages all the proccess 
+    class for login/signup :
+    class for  theme :
+    class for upload product :
+    class for for saving chrome instance : file.chrome  
+    class for test .
+"""
+
+# next step is refactoring this code
+
