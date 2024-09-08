@@ -15,6 +15,8 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
+
+
 class SignIn:
     def __init__(self, driver: DriverManager, username, password):
         self.driver = driver
@@ -50,6 +52,9 @@ class SignIn:
         try:
             skipAllButton = self.driver.find_element(By.ID, 'navigation-skip-all-button')
             self.wrapClickButton(skipAllButton)
+            raise NotClickableException("the element is not clickable")
+        except NotClickableException as es:
+            raise es
         except Exception as e:
             print("Skip All button not found or not clickable." + str(e))
 
@@ -71,7 +76,7 @@ class SignIn:
 
             self.wrapClickButton(next_button)
             print("'Next' button found. Restarting the script...")
-        except (TimeoutException, NoSuchElementException,Exception) as e:
+        except (TimeoutException, NoSuchElementException, Exception) as e:
             if isinstance(e, NotClickableException):
                 raise NotClickableException("the element is not clickable" + str(e))
             else:
