@@ -1,11 +1,20 @@
+import logging
 import traceback
 
 from selenium.common import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.by import By
-from ...driver.DriverManger import DriverManager
-from ...exception.NotClickableException import NotClickableException
 
+from src.driver.DriverManger import DriverManager
+from src.exception.NotClickableException import NotClickableException
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("app.log"),
+        logging.StreamHandler()
+    ]
+)
 class SignIn:
     def __init__(self, driver: DriverManager, username, password):
         self.driver = driver
@@ -38,14 +47,11 @@ class SignIn:
         self.driver.random_sleep(15, 20)
 
     def checkIfThereIsAnySkippedStep(self):
-        isThereAnySkipElement = True
-        while isThereAnySkipElement:
-            try:
-                skipAllButton = self.driver.find_element(By.ID, 'navigation-skip-all-button')
-                self.wrapClickButton(skipAllButton)
-            except Exception as e:
-                print("Skip All button not found or not clickable." + str(e))
-                isThereAnySkipElement = False
+        try:
+            skipAllButton = self.driver.find_element(By.ID, 'navigation-skip-all-button')
+            self.wrapClickButton(skipAllButton)
+        except Exception as e:
+            print("Skip All button not found or not clickable." + str(e))
 
     def wrapClickButton(self, element):
         try:
@@ -65,7 +71,7 @@ class SignIn:
 
             self.wrapClickButton(next_button)
             print("'Next' button found. Restarting the script...")
-        except (TimeoutException, NoSuchElementException) as e:
+        except (TimeoutException, NoSuchElementException,Exception) as e:
             if isinstance(e, NotClickableException):
                 raise NotClickableException("the element is not clickable" + str(e))
             else:

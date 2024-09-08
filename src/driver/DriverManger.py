@@ -1,3 +1,4 @@
+import logging
 import random
 import time
 import webbrowser
@@ -6,7 +7,14 @@ from selenium import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.support.wait import WebDriverWait
 
-
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("app.log"),
+        logging.StreamHandler()
+    ]
+)
 class DriverManager(webdriver.Chrome):
     def __init__(self):
         super().__init__()

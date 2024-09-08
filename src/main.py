@@ -1,5 +1,5 @@
 from driver.DriverManger import DriverManager
-from process_steps.SignUpAndLogin.SignIn import SignIn
+from src.process_steps.SignIn import SignIn
 from src.exception.NotClickableException import NotClickableException
 
 url = "https://www.shopify.com/"
@@ -15,6 +15,7 @@ def main():
 
     #SignIn
     signIn = SignIn(driver, EMAIL, PASSWORD)
+    driver.get_url(url)
     try:
         signIn.login()
     except Exception as e:
@@ -22,7 +23,6 @@ def main():
             reset_and_run(driver)
             return
 
-    driver.get_url(url)
 
 
 def reset_and_run(driver):
