@@ -1,28 +1,28 @@
 from driver.DriverManger import DriverManager
+from src.accountParameters.AccountParameters import AccountParameters
 from src.process_steps.SignIn import SignIn
 from src.exception.NotClickableException import NotClickableException
 
-url = "https://www.shopify.com/"
-
-EMAIL = "jkh_jlop69@hotmail.com"
-PASSWORD = "pptproject12345"
 
 
 def main():
-    driver: DriverManager = DriverManager()
     #first we need to get the parameters from parameter Manager
-    # second initiate driver
+    parameters = AccountParameters()
+    account_list = parameters.getAccounts()
 
-    #SignIn
-    signIn = SignIn(driver, EMAIL, PASSWORD)
-    driver.get_url(url)
-    try:
-        signIn.login()
-    except Exception as e:
-        if isinstance(e, NotClickableException):
-            reset_and_run(driver)
-            return
+    for account in account_list:
+        #  initiate driver for each account
+        driver: DriverManager = DriverManager()
 
+        #Sign in
+        signIn = SignIn(driver, account.email, account.password)
+        driver.get_url(parameters.geturl())
+        try:
+            signIn.login()
+        except Exception as e:
+            if isinstance(e, NotClickableException):
+                reset_and_run(driver)
+                return
 
 
 def reset_and_run(driver):
