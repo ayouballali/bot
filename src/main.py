@@ -1,8 +1,10 @@
+from distutils.command.upload import upload
+
 from driver.DriverManger import DriverManager
 from src.accountParameters.AccountParameters import AccountParameters
 from src.process_steps.SignIn import SignIn
 from src.exception.NotClickableException import NotClickableException
-
+from src.process_steps.Upload_theme import Addtheme
 
 
 def main():
@@ -17,13 +19,15 @@ def main():
         #Sign in
         signIn = SignIn(driver, account.email, account.password)
         driver.get_url(parameters.geturl())
+        #upload-theme
+        uploadtheme = Addtheme(driver)
         try:
             signIn.login()
+            uploadtheme.onlinestore()
         except Exception as e:
             if isinstance(e, NotClickableException):
                 reset_and_run(driver)
                 return
-
 
 def reset_and_run(driver):
     driver.quit()
